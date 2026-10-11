@@ -13,6 +13,7 @@ const (
 	Goyabu       SourceKind = "Goyabu"
 	AnimesOnline SourceKind = "AnimesOnline"
 	SuperFlix    SourceKind = "SuperFlix"
+	MeusAnimes 	 SourceKind = "MeusAnimes"
 	AniDB        SourceKind = "AniDB"
 
 	// Unknown is returned when no definition matches. It is surfaced with a

@@ -490,3 +490,21 @@ func (s *cfBrowserSolver) Solve(ctx context.Context, targetURL string, timeout t
 		UserAgent: ua,
 	}, nil
 }
+
+// FetchHTMLWithBrowser opens a URL with the existing browser session.
+func FetchHTMLWithBrowser(
+	ctx context.Context,
+	targetURL string,
+	timeout time.Duration,
+) ([]byte, error) {
+	result, err := defaultCFSolver.Solve(ctx, targetURL, timeout)
+	if err != nil {
+		return nil, fmt.Errorf("browser fetch failed: %w", err)
+	}
+
+	if result == nil || strings.TrimSpace(result.HTML) == "" {
+		return nil, fmt.Errorf("browser fetch returned empty HTML")
+	}
+
+	return []byte(result.HTML), nil
+}

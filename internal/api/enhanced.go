@@ -247,9 +247,11 @@ func searchAnimeEnhanced(
 	case "superflix":
 		registryKinds = []apisource.SourceKind{apisource.SuperFlix}
 	case "anidb":
-    	registryKinds = []apisource.SourceKind{apisource.AniDB}
+		registryKinds = []apisource.SourceKind{apisource.AniDB}
+	case "meusanimes":
+		registryKinds = []apisource.SourceKind{apisource.MeusAnimes}
 	case "animesonline":
-    	registryKinds = []apisource.SourceKind{apisource.AnimesOnline}
+		registryKinds = []apisource.SourceKind{apisource.AnimesOnline}
 	case "ptbr", "pt-br":
 		registryKinds = []apisource.SourceKind{apisource.AnimeFire, apisource.Goyabu, apisource.SuperFlix, apisource.AnimesOnline}
 	}
@@ -293,6 +295,8 @@ func searchAnimeEnhanced(
 				anime.Source = "SuperFlix"
 			case "anidb":
 				anime.Source = "AniDB"
+			case "meusanimes":
+				anime.Source = "MeusAnimes"
 			}
 			if anime.Source == "" {
 				lowerURL := strings.ToLower(anime.URL)
@@ -306,7 +310,9 @@ func searchAnimeEnhanced(
 				case strings.Contains(lowerURL, "anidb.app"):
 					anime.Source = "AniDB"
 				case strings.Contains(lowerURL, "animesonlinecc.to"):
-    				anime.Source = "AnimesOnline"
+					anime.Source = "AnimesOnline"
+				case strings.Contains(lowerURL, "meusanimes.blog"):
+					anime.Source = "MeusAnimes"
 				}
 			}
 		}

@@ -12,6 +12,7 @@ import (
 	"github.com/alvarorichard/Goanime/internal/scraper/providers/animesonline"
 	"github.com/alvarorichard/Goanime/internal/scraper/providers/superflix"
 	"github.com/alvarorichard/Goanime/internal/util"
+	"github.com/alvarorichard/Goanime/internal/scraper/providers/meusanimes"
 )
 
 // Stream-fetch indirections. Production points at the proven api layer — the
@@ -220,6 +221,79 @@ func (p *animesOnlineProvider) FetchStreamURL(
 	}
 
 	return streamURL, nil
+}
+
+// --- Meus Animes Provider ---
+
+type meusAnimesProvider struct {
+	once   sync.Once
+	client *meusanimes.Client
+}
+
+func init() {
+	source.Register(&meusAnimesProvider{})
+}
+
+func (p *meusAnimesProvider) getClient() *meusanimes.Client {
+	p.once.Do(func() {
+		p.client = meusanimes.NewClient()
+	})
+	return p.client
+}
+
+func (p *meusAnimesProvider) Describe() source.Descriptor {
+	return source.Descriptor{
+		Kind:        source.MeusAnimes,
+		Priority:    18,
+		Explicit:    []string{"MeusAnimes", "Meus Animes"},
+		Tags:        []string{"[meusanimes]"},
+		URLMatchers: []string{"meusanimes.blog"},
+		ProbeURL:    "https://meusanimes.blog",
+	}
+}
+
+func (p *meusAnimesProvider) Search(
+	ctx context.Context,
+	query string,
+) ([]*models.Anime, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	results, err := p.getClient().Search(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("meusanimes search: %w", err)
+	}
+
+	tagResults(results, source.MeusAnimes)
+	return results, nil
+}
+
+func (p *meusAnimesProvider) FetchEpisodes(
+	ctx context.Context,
+	anime *models.Anime,
+) ([]models.Episode, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	return p.getClient().Episodes(ctx, anime.URL)
+}
+
+func (p *meusAnimesProvider) FetchStreamURL(
+	ctx context.Context,
+	episode *models.Episode,
+	anime *models.Anime,
+	_ string,
+) (string, error) {
+	if err := ctx.Err(); err != nil {
+		return "", err
+	}
+	if episode == nil {
+		return "", fmt.Errorf("meusanimes: episódio inválido")
+	}
+
+	return p.getClient().Stream(ctx, episode.URL)
 }
 
 // --- AniDB Provider ---
